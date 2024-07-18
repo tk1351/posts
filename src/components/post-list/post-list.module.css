@@ -1,0 +1,19 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title__section {
+    width: max-content;
+}
+
+.title {
+    font-size: 32px;
+}
+
+.list__tags {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}

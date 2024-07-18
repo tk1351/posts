@@ -1,5 +1,7 @@
-import { component$, Slot } from "@builder.io/qwik";
+import { component$, Slot, useStyles$ } from "@builder.io/qwik";
 import type { RequestHandler } from "@builder.io/qwik-city";
+import styles from "./layout.module.css";
+import prismStyle from "prism-themes/themes/prism-a11y-dark.css?inline";
 
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
@@ -13,5 +15,14 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  return <Slot />;
+  useStyles$(prismStyle);
+  return (
+    <div class={styles.container}>
+      <header>header</header>
+      <main>
+        <Slot />
+      </main>
+      <footer>footer</footer>
+    </div>
+  );
 });

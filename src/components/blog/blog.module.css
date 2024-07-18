@@ -1,0 +1,9 @@
+.title {
+    font-size: 32px;
+}
+
+.list__tags {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}

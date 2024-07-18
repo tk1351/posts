@@ -1,0 +1,112 @@
+---
+title: アクセシビリティを担保したアイコンボタンの作り方
+createdAt: 2024-07-12
+tags:
+- Frontend
+- HTML
+- a11y
+---
+
+import { Blog } from "../../../components/blog/blog.tsx";
+
+
+<Blog />
+
+昨今のWebアプリケーションなどではテキストがなくアイコンのみが表示されているボタンがあらゆる場面で使用されています。
+
+この記事ではアクセシビリティの観点で主に採用したいパターンをいくつかまとめていきます。
+
+## svg 要素が button 要素に含まれる場合
+
+下記のようなマークアップを想定しています。
+
+```html
+<button>
+    <svg aria-hidden="true" width="" height="" viewBox="">
+        <path d="" fill=""></path>
+        <path d="" stroke="" stroke-width=""></path>
+    </svg>
+</button>
+```
+
+### 1. button 要素に aria-label を付与する
+
+`aria-label` 属性はある要素に対してアクセシブルな名前を付与することができます。支援技術の読み上げなどでは svg 要素が持っている視覚的な情報は意味を成さないため、ボタンそのものに名前を付けてしまうアプローチです。
+
+```html
+<button aria-label="閉じる">
+    <svg aria-hidden="true" width="" height="" viewBox="">
+        <path d="" fill=""></path>
+        <path d="" stroke="" stroke-width=""></path>
+    </svg>
+</button>
+```
+
+これでこのボタンを押すと例えばダイアログなどの何らかの要素を閉じることができると伝えることができます。
+
+しかし、この例では svg 要素自体に「閉じる」という意味を持った画像があることが想定され、 button 要素自体にはテキストがないことからあまり妥当な対応策とは言えないとも考えられます。
+
+### 2. Visually Hidden クラスを付与する
+
+Visually Hidden とは Accessibility Object Model ( `display: none` , `visibility: hidden` など ) からも無視されてしまうCSSプロパティを使わずに、要素を視覚的に隠しつつアクセシブルな名前を提供する方法です。
+
+Bootstrap や Tailwind などのライブラリでも Visually Hidden を担保させるクラスや機能は用意されています。下記は Tailwind の例です。
+
+```css
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+```
+
+これを button 要素の子要素にテキストとなる span 要素へクラスを当てることで実現させます。
+
+```html
+<button>
+    <span class="visually-hidden">閉じる</span>
+    <svg aria-hidden="true" width="" height="" viewBox="">
+        <path d="" fill=""></path>
+        <path d="" stroke="" stroke-width=""></path>
+    </svg>
+</button>
+```
+
+### 3. svg 要素に role="img" と aria-label を付与する
+
+この方法は button 要素ではなく画像である svg 要素に `role` 属性と `aria-label` を付与するものです。
+
+`role="img"` を付与して svg 要素自体が装飾ではなく画像であることを伝え、 `aria-label` で補足をするという考え方です。
+
+```html
+<button>
+    <svg role="img" aria-label="閉じる" width="" height="" viewBox="">
+        <path d="" fill=""></path>
+        <path d="" stroke="" stroke-width=""></path>
+    </svg>
+</button>
+```
+
+### aria-label を使用する際の注意点
+
+`aria-label` 属性に限らず WAI-ARIA はあくまでも補助の役割を担っているのに過ぎないため使い過ぎは注意です。例えばHTMLの仕様として下記の方法でアクセシブルな名前を与えることが可能です。
+
+| HTML要素       | アクセシブルな名前を与える方法    |
+|--------------|--------------------|
+| button       | button の中にテキストを入れる |
+| href 属性を持つ a | a の中にテキストを入れる      |
+| img          | alt                |
+| input        | label              |
+| select       | label              |
+| textarea     | label              |
+| table        | caption            |
+| figure       | figcaption         |
+| fieldset     | legend             |
+
+各要素にまずはテキストを入れるなど、HTMLの仕様としてアクセシブルな名前を与えられないか検討する必要があります。
